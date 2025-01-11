@@ -15,16 +15,15 @@ if (process.argv.length<3) {
   process.exit(1) // Exit process with error code 1
 }
 
-// Store the password from command line argument that we enter (node mongo.js 123Monkey in this case) 
+// Store the password from command line argument that we enter (node mongo.js 123Monkey in this case)
 // into a variable
-const password = process.argv[2]
 
 // Create the MongoDB connection URL string
 // This includes username, password, cluster address, database name (noteApp)
 // and various connection options
 const url = process.env.MONGODB_URI
 
- // Configure mongoose to be less strict about queries
+// Configure mongoose to be less strict about queries
 // This prevents some deprecation warnings
 mongoose.set('strictQuery',false)
 
@@ -49,27 +48,9 @@ const noteSchema = new mongoose.Schema({
 // - Delete notes
 const Note = mongoose.model('Note', noteSchema)
 
-/*
-// These lines are creating new notes objects with the help of the Note model above
-const note = new Note({
-  content: 'HTML is easy',
-  important: true,
-})
 
-const note2 = new Note({
-    content: 'CSS is hard',
-    important: true,
-})
-
-const note3 = new Note({
-    content: 'Mongoose makes things easy',
-    important: true,
-})
-
-
-
-// These lines save the object to the database 
-// When the object is saved to the database, the event handler provided to "then" gets called. 
+// These lines save the object to the database
+// When the object is saved to the database, the event handler provided to "then" gets called.
 // The event handler closes the database connection with the .close() method.
 note.save().then(result => {
   console.log('note saved!')
@@ -86,14 +67,14 @@ note3.save().then(result => {
 
 // If we comment out the code for adding new notes, they will persist in the database if we previously added them.
 // Now we can run this code and them all printed to the console. (The VS code console, not the browser console.)
-// The objects are retrieved from the database with the find method of the Note model. The parameter is an object 
+// The objects are retrieved from the database with the find method of the Note model. The parameter is an object
 // that specifies the criteria for finding the notes. Since it is an empty object {}, all notes are returned.
 // We could restrict our search to only important notes like this: Note.find({ important: true }).then(result => {
 Note.find({}).then(result => {
-    result.forEach(note => {
-      console.log(note)
-    })
-    mongoose.connection.close()
+  result.forEach(note => {
+    console.log(note)
   })
+  mongoose.connection.close()
+})
 
 
