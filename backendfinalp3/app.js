@@ -1,52 +1,73 @@
+/*This file acts as the application's backbone, bringing together all components
+and establishing the request processing pipeline. It's crucial for maintaining a
+well-structured and maintainable Express application. */
+
+/*The mongo.js file is specifically used as a development and testing utility -
+it's not part of the production application flow. While app.js handles the actual
+database connections in the deployed application, mongo.js serves as a standalone script for developers to:
+
+Test database connectivity
+Manually add test data
+Verify database operations
+Debug database interactions */
+
+/* we uses require statements to bring in both built-in modules and custom
+modules from different files in the project. The main pieces being imported are: */
+
 const config = require('./utils/config')
-// Import the Express library, a minimal and flexible web application framework for Node.js
-// Express simplifies the creation of server-side logic, such as handling HTTP requests and defining APIs.
+// Imports Express.js framework and creates a new Express application instance.
 const express = require('express')
-// This will automatically catch errors in async functions and pass them to the error handler middleware.
-// This eliminates the need for manual error handling and simplifies error handling in asynchronous code.
-// So we do not need to use try/catch blocks in our route handlers.
-// We also do not need to use the next function to pass errors to the error handler middleware,
-// as the error handling middleware will automatically catch and handle them.
-require('express-async-errors')
-// Create an instance of an Express application
-// `app` represents the server application that will handle incoming HTTP requests and send responses.
-// This instance provides methods for defining routes, applying middleware, and starting the server.
 const app = express()
-// Middleware that allows us to accept requests from ALL origins
+// Adds support for handling async errors in Express routes without try-catch blocks.
+require('express-async-errors')
+// Imports CORS middleware to enable cross-origin requests between different domains.
 const cors = require('cors')
+// Imports route handlers for notes and users from their respective controller files.
+// In these files we have defined notesRouter and usersRouter as express.Router() objects.
 const notesRouter = require('./controllers/notes')
+const usersRouter = require('./controllers/users')
+// Imports our custom middleware functions for logging, handling unknown endpoints, and error handling.
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-const usersRouter = require('./controllers/users')
+// Imports mongoose library for interacting with MongoDB databases
 const mongoose = require('mongoose')
-
+// Configures mongoose to use less strict query filtering
 mongoose.set('strictQuery', false)
-
+// Logs a message using our logger utility when the application connects to our MongoDB database.
 logger.info('connecting to', config.MONGODB_URI)
 
+/*establishes a connection to MongoDB (a database) using mongoose.
+ When the connection succeeds, it logs a success message; if it fails,
+  it logs an error message. This connection allows the app to store and retrieve data. */
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
     logger.info('connected to MongoDB')
   })
   .catch((error) => {
-    logger.error('error connecting to MongoDB:', error.message)
+    logger.error('error connection to MongoDB:', error.message)
   })
 
+// Uses the middleware cors to handle requests from different domains
 app.use(cors())
-// Middleware for whenever Express gets an HTTP GET request it will first
-// check if the "dist" directory contains a file corresponding to the request's address.
-// If a file is found, Express will return it.
+// Serves static files from the dist directory
 app.use(express.static('dist'))
-// Middleware is used to process requests before they reach the defined route handlers.
-// Here, `express.json()` is a built-in middleware function that parses incoming requests with JSON payloads.
-// It extracts the JSON data from the request body and makes it accessible in `req.body` in route handlers.
+// Helps the app understand JSON data sent in requests
 app.use(express.json())
+// Uses the middleware logger to log incoming requests
 app.use(middleware.requestLogger)
 
+// This is where we can actually use the router object we created in the controller files
+/*here are two main routes:
+/api/notes handles all requests related to notes using notesRouter
+/api/users handles all requests related to users using usersRouter */
 app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
 
-app.use(middleware.unknownEndpoint)
-app.use(middleware.errorHandler)
+// Here we make use of our two error handling middleware functions
+app.use(middleware.unknownEndpoint) //handles requests to non existent routes
+app.use(middleware.errorHandler)    // processes any errors that occur during request handling
 
+// When another file wants to use this configured app (with all its middleware, routes, and
+// database connections), they can import it using require(). This is particularly useful for
+// separating the app configuration from the actual server startup code.
 module.exports = app

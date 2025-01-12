@@ -1,80 +1,66 @@
-// Import the mongoose library which helps use work with MongoDB
+/*The mongo.js file is specifically used as a development and testing utility - it's not part of the production application flow.
+ While app.js handles the actual database connections in the deployed application, mongo.js serves as a standalone script for developers to:
+
+Test database connectivity
+Manually add test data
+Verify database operations
+Debug database interactions */
+
+
 const mongoose = require('mongoose')
 
-// Check if the environment variable MONGODB_URI is defined
-require('dotenv').config()
-
-
-// Check if there are enough command line arguments (at least 3)
-// process.argv is an array containing command line arguments
-// process.argv[0] is node executable path
-// process.argv[1] is script path
-// process.argv[2] would be the first actual argument (password in this case)
-if (process.argv.length<3) {
+if (process.argv.length < 3) {
   console.log('give password as argument')
-  process.exit(1) // Exit process with error code 1
+  process.exit(1)
 }
 
-// Store the password from command line argument that we enter (node mongo.js 123Monkey in this case)
-// into a variable
+const password = process.argv[2]
 
-// Create the MongoDB connection URL string
-// This includes username, password, cluster address, database name (noteApp)
-// and various connection options
-const url = process.env.MONGODB_URI
+const url =
+  `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/noteApp?retryWrites=true&w=majority`
 
-// Configure mongoose to be less strict about queries
-// This prevents some deprecation warnings
-mongoose.set('strictQuery',false)
+// configures mongoose to less strrict query behavior
+mongoose.set('strictQuery', false)
 
-// Establish connection to MongoDB using the connection URL
-// This returns a promise that resolves when connection is successful
-mongoose.connect(url)
+// Sets up connection to MongoDB database, and defines the structure for storing data in the database (schema)
+/*The code first establishes a connection to MongoDB using mongoose.connect(), where 'url' contains the database
+ connection address. Once the connection is successful (that's what the .then() part means), it moves on to define
+ how our notes should be structured. */
+mongoose.connect(url).then(() => {
+  const noteSchema = new mongoose.Schema({
+    content: String,
+    important: Boolean,
+  })
+  // Finally, the code creates a Note model using mongoose.model('Note', noteSchema).
+  // The first argument 'Note' is the name we give to this collection of notes in our database.
+  const Note = mongoose.model('Note', noteSchema)
 
+  /*
+  const note = new Note({
+    content: 'HTML is x',
+    important: true,
+  })
 
-// These lines are for defining the schema of the note object.
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
-})
-//// This line creates a model called 'Note' based on the noteSchema we defined
-// mongoose.model() is like creating a blueprint for our database documents
-// - 'Note' (first argument) is the name of our model - Mongoose will automatically create a collection called 'notes' (lowercase and plural)
-// - noteSchema (second argument) defines the structure that all Note documents must follow
-// The resulting 'Note' model gives us methods to:
-// - Create new notes
-// - Search for notes (we use the find method down below)
-// - Update notes
-// - Delete notes
-const Note = mongoose.model('Note', noteSchema)
-
-
-// These lines save the object to the database
-// When the object is saved to the database, the event handler provided to "then" gets called.
-// The event handler closes the database connection with the .close() method.
-note.save().then(result => {
-  console.log('note saved!')
-})
-
-note2.save().then(result => {
-    console.log('note saved!')
-})
-
-note3.save().then(result => {
+  note.save().then(result => {
     console.log('note saved!')
     mongoose.connection.close()
-})*/
-
-// If we comment out the code for adding new notes, they will persist in the database if we previously added them.
-// Now we can run this code and them all printed to the console. (The VS code console, not the browser console.)
-// The objects are retrieved from the database with the find method of the Note model. The parameter is an object
-// that specifies the criteria for finding the notes. Since it is an empty object {}, all notes are returned.
-// We could restrict our search to only important notes like this: Note.find({ important: true }).then(result => {
-Note.find({}).then(result => {
-  result.forEach(note => {
-    console.log(note)
   })
-  mongoose.connection.close()
+  */
+
+  // This code retrieves and displays all notes from the database.
+  // The code starts with Note.find({}), which is a database query that searches
+  // for all documents in the Note collection. The empty curly braces {} as the search criteria means "find everything"
+  // that search returns a Promise which is handled by the .then() method.
+  // The code then uses result.forEach() to loop through each note in the result array.
+  // For each note it finds, it prints it to the console using console.log(note).
+  Note.find({}).then(result => {
+    result.forEach(note => {
+      console.log(note)
+    })
+    // Finally, after all notes have been printed, the code calls mongoose.connection.close() to properly close the database connection.
+    mongoose.connection.close()
+  })
 })
+
 
 

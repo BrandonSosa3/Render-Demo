@@ -1,4 +1,14 @@
-/*This file now includes only our custom middleware */
+
+/*
+Contains custom Express middleware
+Implements:
+requestLogger: Logs HTTP request details
+unknownEndpoint: Handles 404 routes
+errorHandler: Central error handling
+CastError handling
+ValidationError handling
+Duplicate key handling
+Generic error fallback */
 
 const logger = require('./logger')
 

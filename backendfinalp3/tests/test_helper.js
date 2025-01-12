@@ -1,3 +1,13 @@
+/* test_helper.js:
+
+Provides shared testing utilities and data
+Contains:
+initialNotes array for consistent test data
+nonExistingId() function to generate valid but unused MongoDB IDs
+notesInDb() function to fetch all notes from test database
+usersInDb() function to fetch all users from test database
+Enables consistent test setup across different test files*/
+
 const Note = require('../models/note')
 const User = require('../models/user')
 

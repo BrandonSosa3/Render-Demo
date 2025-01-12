@@ -1,5 +1,13 @@
-/* Now the responsibility of establishing the connection to the database has been given to the app.js module.
- The note.js file under the models directory only defines the Mongoose schema for notes. */
+/* note.js:
+Defines the schema for Note documents using Mongoose
+Specifies required fields:
+content (String, required, minimum 5 characters)
+important (Boolean)
+user (Reference to User model)
+Includes custom JSON transformation:
+Converts MongoDB _id to id
+Removes unnecessary fields (_id, __v)
+Creates relationship with User model through ObjectId reference */
 
 const mongoose = require('mongoose')
 

@@ -1,3 +1,9 @@
+/*Provides utility functions for testing
+Contains:
+reverse(): String reversal function
+average(): Array average calculator
+Used for demonstrating testing concepts */
+
 const reverse = (string) => {
   return string
     .split('')
