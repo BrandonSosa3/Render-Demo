@@ -1,43 +1,36 @@
-/* note_api.test.js:
-Combines both note and user testing in one comprehensive file
-Uses describe blocks for better test organization
-Main test groups:
-Notes Testing:
-Initial notes setup and verification
-Note retrieval tests:
-JSON format verification
-All notes returned check
-Specific note content verification
-Specific note operations:
-Viewing individual notes
-Handling valid/invalid IDs
-404 handling for non-existent notes
-Note creation:
-Valid data handling
-Invalid data rejection
-Note deletion:
-Successful deletion verification
-Database state confirmation
-User Testing:
-Initial user setup with bcrypt password hashing
-User creation tests:
-Successful creation with new username
-Proper handling of duplicate usernames
-Status code verification
-Response format checking
-Database state verification after operations
-*/
+/* */
 
+// Here we import important testing tools from node:test
+// we import the specific functions like test, after, beforeEach, describe
 const { test, after, beforeEach, describe } = require('node:test')
+// Assert is imported to check if test results are correct
 const assert = require('node:assert')
+// Mongoose is used to connect to the database
 const mongoose = require('mongoose')
+
+// Supertest is a powerful testing library that makes it easier to
+// test HTTP APIs. It allows you to make test requests to your application
+// without actually starting up a real server.
+
 const supertest = require('supertest')
+
+// This line imports your main application code (from the app.js file in the
+// parent directory). This contains your Express application with all its routes and middleware.
 const app = require('../app')
+// This is where the magic happens! This line creates a "test API" by wrapping your app with Supertest.
+// The api object you get back lets you make test HTTP requests like this:
+/*api.get('/api/notes') to test GET requests
+api.post('/api/notes') to test POST requests
+And so on for other HTTP methods*/
 const api = supertest(app)
+// Imports the bcrypt library, which will be used for password hashing
 const bcrypt = require('bcrypt')
 
+// Imports the helper.js file, which contains some helper functions for testing
+// as well as the initial notes data that will be used in the tests.
 const helper = require('./test_helper')
 
+// Imports the User and Note models from the models directory.
 const User = require('../models/user')
 const Note = require('../models/note')
 

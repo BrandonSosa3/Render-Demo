@@ -5,7 +5,10 @@
  */
 
 // Function for printing normal console log messages
-// We do not print to the console in test mode
+// We do not print to the console if we are running tests
+// The function takes any number of parameters (that's what
+// the ...params means - it can accept one, two, or many inputs).
+// These parameters can be any type of data you want to log, like text messages, numbers, or objects.
 const info = (...params) => {
   if (process.env.NODE_ENV !== 'test'){
     console.log(...params)
@@ -14,11 +17,15 @@ const info = (...params) => {
 
 // Function for printing error messages to the console
 // We do not print to the console in test mode
+// The ...params syntax means it can accept any number of arguments,
+// collecting them into an array called params.
+// Inside the if block, this line prints the error message(s) to the
+// console using console.error(). The ...params spreads out all the arguments
+// that were passed in, so they get logged exactly as provided.
 const error = (...params) => {
   if (process.env.NODE_ENV !== 'test'){
     console.error(...params)
   }
-  console.error(...params)
 }
 
 /*This is one of two ways to export:

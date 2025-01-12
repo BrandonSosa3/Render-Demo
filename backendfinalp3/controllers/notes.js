@@ -15,15 +15,46 @@ For this reason, the notesRouter object must only define the relative parts of t
 i.e. the empty path / or just the parameter /:id.
 */
 
+// This will stores the router object which we can export and use in all of our code
+// This object will hold all routes for our notes.
 const notesRouter = require('express').Router()
+// This imports the Note and User model which defines what a note and user looks like
 const Note = require('../models/note')
 const User = require('../models/user')
 
+// This is a route handler for getting all notes from the database
+// The code uses async/await to handle asynchronous database operations.
+// It queries the database using the Note model (which represents notes in the database) with .find({}).
+// The empty object {} means it will find all notes without any filtering conditions.
 notesRouter.get('/', async (request, response) => {
   const notes = await Note
+  // The .populate('user', { username: 1, name: 1 }) part is interesting - it tells the database
+  // to also fetch related user information for each note, specifically getting the username and name fields from the associated user records.
+  // This is adding the user info to the notes object.
     .find({}).populate('user', { username: 1, name: 1 })
+    // For outputs, the handler sends back all the found notes as JSON using response.json(notes).
+    // The notes will include both the note data and the populated user information.
   response.json(notes)
 })
+
+
+// The code handles HTTP GET requests to fetch a single note by its ID.
+// When someone makes a request to this route (like visiting /notes/123 where 123 is an ID),
+// the code takes that ID from the URL parameters as its input.
+notesRouter.get('/:id', async (request, response) => {
+  // Using this ID, the code searches the database using Note.findById() to find a matching note.
+  // The async/await syntax is used here because searching the database takes some time, and we want to wait for the result before continuing.
+  const note = await Note.findById(request.params.id)
+  // The code then follows two possible paths:
+  // If a note is found (note exists), it sends back the note data as JSON to whoever requested it
+  // If no note is found (note is null/undefined), it sends back a 404 status code, which means "not found"
+  if (note) {
+    response.json(note)
+  } else {
+    response.status(404).end()
+  }
+})
+
 
 notesRouter.put('/:id', async (request, response) => {
   const body = request.body
@@ -53,15 +84,6 @@ notesRouter.post('/', async (request, response) => {
   await user.save()
 
   response.status(201).json(savedNote)
-})
-
-notesRouter.get('/:id', async (request, response) => {
-  const note = await Note.findById(request.params.id)
-  if (note) {
-    response.json(note)
-  } else {
-    response.status(404).end()
-  }
 })
 
 notesRouter.delete('/:id', async (request, response) => {

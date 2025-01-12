@@ -29,6 +29,8 @@ const usersRouter = require('./controllers/users')
 // Imports our custom middleware functions for logging, handling unknown endpoints, and error handling.
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
+// Imports the loginRouter from the controllers/login.js file.
+const loginRouter = require('./controllers/login')
 // Imports mongoose library for interacting with MongoDB databases
 const mongoose = require('mongoose')
 // Configures mongoose to use less strict query filtering
@@ -62,6 +64,12 @@ app.use(middleware.requestLogger)
 /api/users handles all requests related to users using usersRouter */
 app.use('/api/notes', notesRouter)
 app.use('/api/users', usersRouter)
+
+// It tells Express to use the loginRouter to handle any requests that
+// come to the '/api/login' URL path. When users try to log in to the application,
+// their requests will be directed to this route, where the loginRouter (defined in controllers/login.js)
+// will process the login credentials and authenticate users.
+app.use('/api/login', loginRouter)
 
 // Here we make use of our two error handling middleware functions
 app.use(middleware.unknownEndpoint) //handles requests to non existent routes

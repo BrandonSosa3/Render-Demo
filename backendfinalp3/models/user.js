@@ -1,9 +1,4 @@
-/*This code defines the structure of a user in a database using Mongoose,
-The schema specifies four main pieces of information that we'll store for each user:
-A username (which must be provided and must be unique)
-A name
-A passwordHash (which is a secure way to store passwords)
-A list of notes associated with the user*/
+/*In this file we are creating models to be used elsewhere*/
 
 const mongoose = require('mongoose')
 
@@ -43,6 +38,6 @@ userSchema.set('toJSON', {
 })
 
 // Here we create a User model using this schema and making it available for export to be used in other parts of the application
-const User = mongoose.model('User', userSchema)
 
-module.exports = User
+
+module.exports = mongoose.model('User', userSchema)
